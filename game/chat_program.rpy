@@ -19,48 +19,42 @@ init python:
     who_is_typing = ""
     who_was_typing_list = []
     last_sender = ""
-    last_window = "X"
+    last_window = ""
 
     # this is also for formatting 
-    current_window = "#team-adoai"
-    active_window = "#team-adoai"
+    current_window = ""
+    active_window = ""
 
     # character info 
-    character_names = {
-        "Felix" : "Doyle", 
-        "Jerri" : "Ngo", 
-        "Major" : "Alstone", 
-        "Sungho" : "Go"
-    }
+    character_names = {}
 
     # chat groups 
-    channels = {
-        "#team-adoai" : [], 
-        "Felix" : [] 
-    }
+    channels = {}
+
+    # optional images for chat icons
+    channel_images_on = True
+    channel_images = {}
 
     # indicator for when a new message arrives 
-    channels_new_message = {
-        "#team-adoai" : False, 
-        "Felix" : False
-    }
+    channels_new_message = {}
 
     # who sent the last message in the channel 
-    channels_last_sender = {
-        "#team-adoai" : "", 
-        "Felix" : ""
-    }
+    channels_last_sender = {}
 
 
     ## chat functions 
 
     # function to call to reset/clear everything 
+    # this is where the variable basics are laid out 
     def reset_chats(): 
         global current_window
         global active_window
         global character_names 
         global channels 
+        global channel_images_on
+        global channel_images
         global channels_new_message 
+        global channels_last_sender
         global who_is_typing
         global who_was_typing_list  
         global last_sender
@@ -87,6 +81,13 @@ init python:
         channels = {
             "#team-adoai" : [], 
             "Felix" : [] 
+        }
+
+        # optional images for chat icons
+        channel_images_on = True
+        channel_images = {
+            "#team-adoai" : "channel icons/_default.png", 
+            "Felix" : "channel icons/_default.png"
         }
 
         # indicator for when a new message arrives 
@@ -118,6 +119,8 @@ init python:
     def chat_message(s, c="#team-adoai", ot="", is_player = False): # string, channel, others typing, is player
         global chat_speed 
         global channels
+        global channel_images_on
+        global channel_images
         global channels_new_message
         global channels_last_sender
         global current_window
@@ -150,6 +153,8 @@ init python:
         if c not in channels.keys(): 
             channels[c] = []
             channels_last_sender[c] = "" 
+            if channel_images_on: 
+                channel_images[c] = "channel icons/" + c + ".png"
 
         # if not active in that channel, light up that button 
         if current_window != c: 
@@ -271,10 +276,14 @@ screen chat_messages_view:
         vbox: 
             spacing 20
             for l in channels.keys(): 
-                textbutton l:
-                    if channels_new_message[l]:
-                        text_color "#EAC119"
-                    else: 
-                        text_color "#FFFFFF"
-                    text_hover_color "#D6FF1B"
-                    action SetDict(channels_new_message, l, False), SetVariable("current_window", l) 
+                hbox: 
+                    if channel_images_on:
+                        imagebutton: 
+                            idle channel_images[l]
+                    textbutton l:
+                        if channels_new_message[l]:
+                            text_color "#EAC119"
+                        else: 
+                            text_color "#FFFFFF"
+                        text_hover_color "#D6FF1B"
+                        action SetDict(channels_new_message, l, False), SetVariable("current_window", l) 
