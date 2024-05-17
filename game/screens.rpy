@@ -208,21 +208,29 @@ style input:
 screen choice(items):
     style_prefix "choice"
 
-    hbox:
-        for i in items:
-            textbutton i.caption action i.action
+    window: 
+        area (851, 1129, 1349, 194)
+        background None
+        if active_window == current_window: 
+            vbox:
+                xalign 0.0 
+                spacing 0 
+                yalign 0.5
+                for i in items:
+                    textbutton i.caption:
+                        action i.action 
+                        xmaximum 1300
+                        background None 
+                        text_xalign 0.0
 
 
 style choice_hbox is hbox
 style choice_button is button
 style choice_button_text is button_text
 
-style choice_hbox:
-    xalign 0.5
-    yalign 0.9
-    #yanchor 0.5
-
-    spacing gui.choice_spacing
+style choice_vbox:
+    xalign 0.0
+    spacing 0
 
 style choice_button is default:
     properties gui.button_properties("choice_button")

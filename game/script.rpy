@@ -33,6 +33,31 @@
 # I offer no real support on this. If you catch me you catch me. Good luck soldier 
 
 
+##-----------------------------------------------------
+## CHOICE SCREEN 
+
+# YOU MUST CHANGE YOUR CHOICE SCREEN TO BE SOMETHING LIKE THIS IN ORDER FOR 
+# CHOICES TO APPEAR ON THE CORRECT WINDOW AND FOR FORMATTING TO WORK
+
+# screen choice(items):
+#     style_prefix "choice"
+#     window: 
+#         area (851, 1129, 1349, 194)
+#         background None
+#         if active_window == current_window: 
+#             vbox:
+#                 xalign 0.0 
+#                 spacing 0 
+#                 for i in items:
+#                     textbutton i.caption:
+#                         action i.action 
+#                        xmaximum 1300
+#                         background None 
+#                         text_xalign 0.0
+#
+# define gui.choice_button_width = None
+# define gui.choice_button_height = None
+
 
 
 ##-----------------------------------------------------
@@ -78,27 +103,40 @@ label cont_3:
     ## in felix chat 
     $ chat_message("Felix: Can you believe this bullshit", c="Felix")
 
+    $ player_choice([
+        ("tf are you talking about", "")
+    ])
+
     ## in jerri chat (new chat!)
     $ chat_message("Jerri: Tell that asshole he can eat fucking dirt", c="Jerri")
     pause 2 
     $ chat_message("Jerri: Actually", c="Jerri")
     $ chat_message("Jerri: Don't dirty your hands king", c="Jerri")
+    $ player_choice([
+        ("??????", "")
+    ])
 
-    ## more nonsense to demo 
+    ## back to main chat 
     $ chat_message("Jerri: @Felix eat fucking dirt")
     $ chat_message("Felix: You first")
     $ chat_message("Jerri: BROOOOOOOOO")
 
+    ## jerri chat 
     $ chat_message("Jerri: He's actually the worst isn't he", c="Jerri")
     $ chat_message("Jerri: Like", c="Jerri")
     $ chat_message("Jerri: What the hell is his problem", c="Jerri")
+    $ player_choice([
+        ("honestly you both seem to have a lot of problems", "")
+    ])
 
+    ## main chat 
     $ chat_message("Major: ?")
-    $ chat_message("Sungho: lol what we miss")
+    $ chat_message("Sungho: lol what we miss",fastmode=0.2)
     $ chat_message("Jerri: Felix being an absolute dickbag")
-    $ chat_message("Jerri: lol", ot="Felix,Sungho,Major")
+    $ chat_message("Jerri: ITS TRUE DONT EVEN TRY TO DENY IT", ot="Felix,Sungho,Major")
     $ chat_message("Major: he what", ot="Sungho,Felix")
     $ chat_message("Felix: she's LYING", ot="Sungho")
     $ chat_message("Sungho: HAHAHAHAHA")
 
+    $ preferences.afm_enable = False 
     $ renpy.pause(hard=True)
