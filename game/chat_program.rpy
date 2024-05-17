@@ -212,7 +212,7 @@ init python:
             channels[c].append("\n{b}" + n +  " " + character_names[n] +  "{/b}\n" + t)
 
         # play the sound 
-        if last_window == active_window: 
+        if current_window == c: 
             renpy.play(ping_sound)
         else: 
             renpy.play(ping_sound_other_channel)
