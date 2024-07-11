@@ -68,7 +68,7 @@
 ## DEMO
 
 ## Set up characters that'll speak in chat
-default mc = ChatCharacter("[player_fname] [player_lname]", is_player=True, icon="images/Player.png")
+default mc = ChatCharacter("[player_fname] [player_lname]", is_player=True)
 #If you change mc to something else for the player's ChatCharacter, be sure to update the choice screen in screens.rpy where the line has a comment with TODO marker as well to your player ChatCharacter
 
 default j = ChatCharacter("Jerri Ngo", icon="images/Jerri.png", name_color="#48E443")

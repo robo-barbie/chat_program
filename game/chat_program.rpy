@@ -151,7 +151,7 @@ init python:
             "Felix" : None
         }
 
-    def chat_message(sender, message, c="#team-adoai", ot=None, fastmode=-1, is_player=False, icon=None):
+    def chat_message(sender, message, c="#team-adoai", ot=None, fastmode=-1, is_player=False):
         """
         sender: ChatCharacter() object
         ChatCharacter() object of the person who sends the message
@@ -398,13 +398,13 @@ screen chat_messages_view:
             for chat in channels[current_window]:
                 hbox:
                     spacing 20
-                    if chat["include_icon"]: # if should include icon of sender
+                    if chat["include_icon"] and chat["icon"]: # if sender has icon and should include icon of sender (i.e. last message isn't from this same sender)
                         add chat["icon"]
                     else:
                         null width 70 # change this to the width of the icons
 
                     vbox:
-                        if chat["include_name"]: # if should include name of sender
+                        if chat["include_name"]: # if should include name of sender (i.e. last message isn't from this same sender)
                             text chat["name"]: # sender name
                                 size 30
                                 color chat["name_color"] # By default, this uses name_color argument passed to the ChatCharacter(). If you want all characters to just use the same color, then just change this to color "#FFF" (replace "#FFF" with whatever your desired color hex value)
