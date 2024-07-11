@@ -29,26 +29,36 @@
 # YOU MUST CHANGE YOUR CHOICE SCREEN TO BE SOMETHING LIKE THIS IN ORDER FOR
 # CHOICES TO APPEAR ON THE CORRECT WINDOW AND FOR FORMATTING TO WORK
 
-# screen choice(items, channel=active_window):
+# screen choice(items, channel=active_window, chat_menu=True):
 #     style_prefix "choice"
 
-#     window:
-#         area (851, 1129, 1349, 194)
-#         background None
-#         if active_window == current_window:
-#             vbox:
-#                 xalign 0.0
-#                 spacing 0
-#                 yalign 0.5
-#                 for i in items:
-#                     textbutton i.caption:
-#                         if not i.kwargs.get("auto_send", True):
-#                             action i.action
-#                         else:
-#                             action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # change mc to the object name you defined for your player character
-#                         xmaximum 1300
-#                         background None
-#                         text_xalign 0.0
+#     if chat_menu:
+#         # This is the choice menu for the chatroom. Style as you like
+#         frame:
+#             background None
+#             area (851, 1129, 1349, 194)
+#             if active_window == current_window:
+#                 vbox:
+#                     xalign 0.0
+#                     spacing 0
+#                     yalign 0.5
+#                     for i in items:
+#                         textbutton i.caption:
+#                             if not i.kwargs.get("auto_send", True):
+#                                 action i.action
+#                             else:
+#                                 action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # TODO change mc to the object name you defined for your player character
+#                             xmaximum 1300
+#                             background None
+#                             text_xalign 0.0
+
+#     else:
+#         # This is the choice menu for normal ADV mode. Style as you like
+#         vbox:
+#             xalign 0.5 yalign 0.5
+#             for i in items:
+#                 textbutton i.caption action i.action:
+#                     xalign 0.5
 
 # define gui.choice_button_width = None
 # define gui.choice_button_height = None
@@ -59,23 +69,30 @@
 
 ## Set up characters that'll speak in chat
 default mc = ChatCharacter("[player_fname] [player_lname]", is_player=True, icon="images/Player.png")
+#If you change mc to something else for the player's ChatCharacter, be sure to update the choice screen in screens.rpy where the line has a comment with TODO marker as well to your player ChatCharacter
+
 default j = ChatCharacter("Jerri Ngo", icon="images/Jerri.png", name_color="#48E443")
 default f = ChatCharacter("Felix Doyle", icon="images/felix.png", name_color="#E4C443")
 default m = ChatCharacter("Major", icon="images/Major.png")
 default s = ChatCharacter("Sungho", icon="images/Sungho.png")
 
 # If you want characters that use normal ADV/NVL visual novel textbox mode, just set it up the normal way with Character() instead of ChatCharacter()
-# default mc_vnmode = Character("[player_fname]")
+default mc_vnmode = Character("[player_fname]")
 
 label start:
 
     $ reset_chats()
 
 label choose_name:
+
     $ player_fname = renpy.input("First name?")
+
+    # if player's inputted name clashes with one of the other ChatCharacter NPCs' first names, loop back to input to make them input a different name.
+    # if you don't want this, then delete this part
     if player_fname in all_npc_first_names:
         "... not that one."
         jump choose_name
+
     $ player_lname = renpy.input("Last name?")
     window hide
 
@@ -147,5 +164,27 @@ label cont:
             mc "wait hold on everyone"
             mc "look at my new icon and name color that i stole from Felix!"(fastmode=1, ot=[f, s])
 
+    # Swap to ADV textbox mode - hide chat screen and turn off auto mode
+    $ preferences.afm_enable = False
+    hide screen chat_messages_view
+
+    mc_vnmode "Test VN mode line" # use the default Character() instead of the ChatCharacter() one for ADV mode lines
+
+    menu (chat_menu=False): # add (chat_menu=False) for normal ADV mode choice menus
+
+        "A normal ADV mode choice":
+            mc_vnmode "I'm all out of lines."
+
+        "A second choice":
+            pass
+
+    # Swaps back to chatroom mode - show chat screen and set auto back on
+    show screen chat_messages_view
+    $ preferences.afm_enable = True
+
+    m "And we're back to the chatroom!"
+    s "Yay!"
+
     $ preferences.afm_enable = False
     $ renpy.pause(hard=True)
+    return

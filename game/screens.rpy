@@ -205,27 +205,36 @@ style input:
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#choice
 
-screen choice(items, channel=active_window):
+screen choice(items, channel=active_window, chat_menu=True):
     style_prefix "choice"
 
-    window:
-        area (851, 1129, 1349, 194)
-        background None
-        if active_window == current_window:
-            vbox:
-                xalign 0.0
-                spacing 0
-                yalign 0.5
-                for i in items:
-                    textbutton i.caption:
-                        if not i.kwargs.get("auto_send", True):
-                            action i.action
-                        else:
-                            action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # TODO change mc to the object name you defined for your player character
-                        xmaximum 1300
-                        background None
-                        text_xalign 0.0
+    if chat_menu:
+        # This is the choice menu for the chatroom. Style as you like
+        frame:
+            background None
+            area (851, 1129, 1349, 194)
+            if active_window == current_window:
+                vbox:
+                    xalign 0.0
+                    spacing 0
+                    yalign 0.5
+                    for i in items:
+                        textbutton i.caption:
+                            if not i.kwargs.get("auto_send", True):
+                                action i.action
+                            else:
+                                action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # TODO change mc to the object name you defined for your player character
+                            xmaximum 1300
+                            background None
+                            text_xalign 0.0
 
+    else:
+        # This is the choice menu for normal ADV mode. Style as you like
+        vbox:
+            xalign 0.5 yalign 0.5
+            for i in items:
+                textbutton i.caption action i.action:
+                    xalign 0.5
 
 style choice_hbox is hbox
 style choice_button is button

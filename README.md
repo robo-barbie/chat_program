@@ -1,5 +1,5 @@
 # Basic Usage
-You can start from this repo to build your project, or just copy over the `chat_program.rpy` script + choices screen code from screens.rpy + stuff in the `images` folder to get started. If you copy those three things over, it should still all work fine (there just might be some small formatting you'll have to do bc I forgot what I did in the screens section).
+You can start from this repo to build your project, or just copy over the `chat_program.rpy` script + choice screen code from screens.rpy + stuff in the `images` folder to get started. If you copy those three things over, it should still all work fine (there just might be some small formatting you'll have to do bc I forgot what I did in the screens section).
 
 Please note that the examples we have below do not tie out to the demo in there! The demo is based on other characters / channel names, but the basics are the same.
 
@@ -283,6 +283,32 @@ Some other functions to know about in case you want to tweak how they work are t
 * **set_is_typing()** controls the logic for how the chat timers work, and
 * **format_typers()** formats the string for who is typing.
 
+# Mixing with ADV Mode
+If you want to mix in ADV mode segments, you should define separate characters for the ADV mode speakers using the default Ren'Py Character() class.
+```
+default mc_vnmode = Character("[player_fname]")
+```
+
+In script:
+```
+# Swap to ADV textbox mode - hide chat screen and turn off auto mode
+$ preferences.afm_enable = False
+hide screen chat_messages_view
+
+mc_vnmode "Test VN mode line"
+```
+
+To show a choice menu in ADV mode, you can pass the argument **(chat_menu=False)** to the menu like this:
+```
+menu (chat_menu=False):
+    "A normal ADV mode choice":
+        mc_vnmode "I'm all out of lines."
+    "A second choice":
+        pass
+```
+
+You can style the ADV mode choice buttons and the chat mode choice buttons separately in the choice screen in screens.rpy.
+
 # The Demo
 Inside of `script.rpy` is a small demo of chats moving between channels + player choices with a diff set of characters than above. Should help show it all in action!
 
@@ -298,3 +324,4 @@ Last updated: Jul 11, 2024 by Windchimes
 - Changed `chat_message()` function so that when adding a new chat message to the channel list for display, it passes a dictionary with separate entries for `name`, `message`, `icon`, `name_color`, `include_name` and `include_icon`, instead of a single string of "Name: message"
 - Adjusted `chat_messages_view` screen code to accommodate for the above change, so that it's now possible to style the name and message differently much easier
 - Changed behavior of the choice button in screens.rpy and `chat_message()` function so that user can control whether choosing a choice would automatically send the choice button caption as chat message from MC or not by passing `(auto_send=False)` to the choice as argument
+- Added examples on how to swap between ADV mode and chatroom mode. Edited choice screen in screens.rpy so it can take menu argument `chat_menu` to determine which mode of choices to use, which can be styled differently
