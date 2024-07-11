@@ -1,142 +1,151 @@
 ﻿##-----------------------------------------------------
-## INFO 
+## INFO
 
-# Welcome to simple chat simulator. This one is meant to emulate a Slack interface, 
-# but can be used for Discord or other things with some tiny changes. 
+# Welcome to simple chat simulator. This one is meant to emulate a Slack interface,
+# but can be used for Discord or other things with some tiny changes.
 # All setup code can be found in "chat_program.rpy"
 
-# New messages appear on the screen "chat_messages_view". 
+# New messages appear on the screen "chat_messages_view".
 
-# To add a new message, use the function "chat_message(s, c, ot)""
-# s = the string of the message, including the sender + a colon and space. 
-# c = the channel (or dm) that you'd like the message to be sent in. 
-# ot = the other people who may also be typing when this message is being typed. 
-
-# To add a player choice, provide a list of tuples to "player_choice()", 
-# where the first element of each tuple is what the player can select and 
-# the second element of each tuple is the label it will jump to after the choice. 
-
-# Some problems with this: 
-# 1. I think the position of the scrollbar carries over from channel to channel as it is. 
+# Some problems with this:
+# 1. I think the position of the scrollbar carries over from channel to channel as it is.
 #     Not a huge deal, but could be annoying to players. I don't remember what my workarounds
-#     for that have been in the past lol. Scrolling might be weird in general. I remember it 
-#     being a headache in my other projects (hence my tendency to use play/pause buttons to 
+#     for that have been in the past lol. Scrolling might be weird in general. I remember it
+#     being a headache in my other projects (hence my tendency to use play/pause buttons to
 #     just stop the scrolling when players wanted)
 # 2. A lot of it is manually sized in the screen because I am lazy, but should be easy to make a lot better
-# 3. You do have to manually set who is typing. My other chat projects were made via spreadsheets 
-#     that could look ahead to see what dialogue was next (and thus construct "who is typing"), but 
-#     I couldn't find a way to do that same thing in just normal renpy. If someone knows how, I would 
+# 3. You do have to manually set who is typing. My other chat projects were made via spreadsheets
+#     that could look ahead to see what dialogue was next (and thus construct "who is typing"), but
+#     I couldn't find a way to do that same thing in just normal renpy. If someone knows how, I would
 #     love that info tho cuz manually setting who is typing is really tedious. You can also ignore
-#     that feature entirely and just show the current speaker as typing, which works for some cases. 
-# 4. I'm sure there's a lot of others. I barely tested this. LOL 
+#     that feature entirely and just show the current speaker as typing, which works for some cases.
+# 4. I'm sure there's a lot of others. I barely tested this. LOL
 
-# I offer no real support on this. If you catch me you catch me. Good luck soldier 
-
+# I offer no real support on this. If you catch me you catch me. Good luck soldier
 
 ##-----------------------------------------------------
-## CHOICE SCREEN 
+## CHOICE SCREEN
 
-# YOU MUST CHANGE YOUR CHOICE SCREEN TO BE SOMETHING LIKE THIS IN ORDER FOR 
+# YOU MUST CHANGE YOUR CHOICE SCREEN TO BE SOMETHING LIKE THIS IN ORDER FOR
 # CHOICES TO APPEAR ON THE CORRECT WINDOW AND FOR FORMATTING TO WORK
 
-# screen choice(items):
+# screen choice(items, channel=active_window):
 #     style_prefix "choice"
-#     window: 
+
+#     window:
 #         area (851, 1129, 1349, 194)
 #         background None
-#         if active_window == current_window: 
+#         if active_window == current_window:
 #             vbox:
-#                 xalign 0.0 
-#                 spacing 0 
+#                 xalign 0.0
+#                 spacing 0
+#                 yalign 0.5
 #                 for i in items:
 #                     textbutton i.caption:
-#                         action i.action 
-#                        xmaximum 1300
-#                         background None 
+#                         if not i.kwargs.get("auto_send", True):
+#                             action i.action
+#                         else:
+#                             action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # change mc to the object name you defined for your player character
+#                         xmaximum 1300
+#                         background None
 #                         text_xalign 0.0
-#
+
 # define gui.choice_button_width = None
 # define gui.choice_button_height = None
 
 
-
 ##-----------------------------------------------------
-## DEMO 
+## DEMO
+
+## Set up characters that'll speak in chat
+default mc = ChatCharacter("[player_fname] [player_lname]", is_player=True, icon="images/Player.png")
+default j = ChatCharacter("Jerri Ngo", icon="images/Jerri.png", name_color="#48E443")
+default f = ChatCharacter("Felix Doyle", icon="images/felix.png", name_color="#E4C443")
+default m = ChatCharacter("Major", icon="images/Major.png")
+default s = ChatCharacter("Sungho", icon="images/Sungho.png")
+
+# If you want characters that use normal ADV/NVL visual novel textbox mode, just set it up the normal way with Character() instead of ChatCharacter()
+# default mc_vnmode = Character("[player_fname]")
 
 label start:
 
-    $ reset_chats() 
+    $ reset_chats()
 
-label choose_name: 
+label choose_name:
     $ player_fname = renpy.input("First name?")
-    if player_fname in character_names.keys(): 
+    if player_fname in all_npc_first_names:
         "... not that one."
         jump choose_name
     $ player_lname = renpy.input("Last name?")
-    $ character_names[player_fname] = player_lname 
-    window hide 
+    window hide
 
-label cont: 
-    ## show chat screen + disable rollback when in chat view 
-    $ _rollback = False 
-    window hide 
-    show screen chat_messages_view 
+label cont:
+    ## show chat screen + disable rollback when in chat view
+    $ _rollback = False
+    window hide
+    show screen chat_messages_view
 
-    ## in team chat 
-    $ chat_message("Jerri: LOOOOSSSEERRR LOSER LOSER LOSER", ot="Felix") 
-    $ chat_message("Jerri: KEEP TYPING LOOOOOOOOOSER", ot="Felix") 
-    $ chat_message("Felix: Holy fucking shit")
-    $ player_choice([
-        ("Huh? What?", "cont_1"), 
-        ("Can you both calm down", "cont_2")
-    ])
+    ## in team chat
+    j "LOOOOSSSEERRR LOSER LOSER LOSER"  (c="#team-adoai", ot=f)
+    j "KEEP TYPING LOOOOOOOOOSER" (ot=f)
+    f "Holy fucking shit"
 
-label cont_1: 
-    $ chat_message("Felix: You're telling me")
-    jump cont_3 
+    menu:
+        "Huh? What?":
+            f "You're telling me"
+        "Can you both calm down":
+            j "NO!!!!"
 
-label cont_2: 
-    $ chat_message("Jerri: NO!!!!") 
-    jump cont_3
-
-label cont_3: 
-    ## in felix chat 
-    $ chat_message("Felix: Can you believe this bullshit", c="Felix")
-
-    $ player_choice([
-        ("tf are you talking about", "")
-    ])
+    ## in felix chat
+    f "Can you believe this bullshit" (c="Felix")
+    menu:
+        "tf are you talking about":
+            pass
 
     ## in jerri chat (new chat!)
-    $ chat_message("Jerri: Tell that asshole he can eat fucking dirt", c="Jerri")
-    pause 2 
-    $ chat_message("Jerri: Actually", c="Jerri")
-    $ chat_message("Jerri: Don't dirty your hands king", c="Jerri")
-    $ player_choice([
-        ("??????", "")
-    ])
+    j "Tell that asshole he can eat fucking dirt" (c="Jerri")
+    pause 2
+    j "Actually"
+    j "Don't dirty your hands king"
 
-    ## back to main chat 
-    $ chat_message("Jerri: @Felix eat fucking dirt")
-    $ chat_message("Felix: You first")
-    $ chat_message("Jerri: BROOOOOOOOO")
+    menu:
+        "??????":
+            pass
 
-    ## jerri chat 
-    $ chat_message("Jerri: He's actually the worst isn't he", c="Jerri")
-    $ chat_message("Jerri: Like", c="Jerri")
-    $ chat_message("Jerri: What the hell is his problem", c="Jerri")
-    $ player_choice([
-        ("honestly you both seem to have a lot of problems", "")
-    ])
+    ## more nonsense to demo
+    j "@Felix eat fucking dirt" (c="#team-adoai")
+    f "You first"
+    j "BROOOOOOOOO"
 
-    ## main chat 
-    $ chat_message("Major: ?")
-    $ chat_message("Sungho: lol what we miss",fastmode=0.2)
-    $ chat_message("Jerri: Felix being an absolute dickbag")
-    $ chat_message("Jerri: ITS TRUE DONT EVEN TRY TO DENY IT", ot="Felix,Sungho,Major")
-    $ chat_message("Major: he what", ot="Sungho,Felix")
-    $ chat_message("Felix: she's LYING", ot="Sungho")
-    $ chat_message("Sungho: HAHAHAHAHA")
+    j "He's actually the worst isn't he" (c="Jerri")
+    j "Like"
+    j "What the hell is his problem"
 
-    $ preferences.afm_enable = False 
+    menu:
+        "honestly you both seem to have a lot of problems":
+            pass
+
+    m "?" (c="#team-adoai")
+    s "lol what we miss"(fastmode=0.2)
+    j "Felix being an absolute dickbag"
+    j "ITS TRUE DONT EVEN TRY TO DENY IT"(ot=[f, s, m])
+    m "he what" (ot=[s, f])
+    f "she's LYING" (ot=s)
+    s "HAHAHAHAHA"
+
+    menu:
+        "wait hold on everyone look at my new icon and name color that i stole from Felix!" (auto_send=False):
+
+            $ mc.icon = "images/Felix.png" # change icon image for mc
+            $ mc.name_color = "#E4C443" # change name color for mc
+            # You can do this for other characters mid-game as well with e.g. j.name_color = "#000"
+
+            # If you put (auto_send=False) after the choice like above, then the choice message doesn't auto send itself after you press the choice button. You'll have to copy the line and add it like normal chat messages yourself
+            # Mostly for cases like this where e.g. you have a icon/name/name_color change after the choice and you want the choice chat message to already reflect the changes
+            # Or if your choice message is really long and you find it weird that MC would send a whole paragraph in one go, then you'd want to break it up into multiple mc "dialogue" lines
+            # Basically like this example that illustrates both cases
+            mc "wait hold on everyone"
+            mc "look at my new icon and name color that i stole from Felix!"(fastmode=1, ot=[f, s])
+
+    $ preferences.afm_enable = False
     $ renpy.pause(hard=True)

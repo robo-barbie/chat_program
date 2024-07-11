@@ -205,22 +205,26 @@ style input:
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#choice
 
-screen choice(items):
+screen choice(items, channel=active_window):
     style_prefix "choice"
 
-    window: 
+    window:
         area (851, 1129, 1349, 194)
         background None
-        if active_window == current_window: 
+        if active_window == current_window:
             vbox:
-                xalign 0.0 
-                spacing 0 
+                xalign 0.0
+                spacing 0
                 yalign 0.5
                 for i in items:
+                    $ auto_send = i.kwargs.get("auto_send", True)
                     textbutton i.caption:
-                        action i.action 
+                        if not auto_send:
+                            action i.action
+                        else:
+                            action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # TODO change mc to the object name you defined for your player character
                         xmaximum 1300
-                        background None 
+                        background None
                         text_xalign 0.0
 
 
