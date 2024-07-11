@@ -81,7 +81,7 @@ label choose_name:
 
 label cont:
     ## show chat screen + disable rollback when in chat view
-    $ _rollback = False
+    $ _rollback = False # Can comment out this line if you want because rollback actually works by jumping back to the last chat choice
     window hide
     show screen chat_messages_view
 

@@ -217,9 +217,8 @@ screen choice(items, channel=active_window):
                 spacing 0
                 yalign 0.5
                 for i in items:
-                    $ auto_send = i.kwargs.get("auto_send", True)
                     textbutton i.caption:
-                        if not auto_send:
+                        if not i.kwargs.get("auto_send", True):
                             action i.action
                         else:
                             action [Function(chat_message, mc, i.caption, channel, is_player =True), i.action] # TODO change mc to the object name you defined for your player character
