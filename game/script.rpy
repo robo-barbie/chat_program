@@ -97,8 +97,7 @@ label choose_name:
     window hide
 
 label cont:
-    ## show chat screen + disable rollback when in chat view
-    $ _rollback = False # Can comment out this line if you want because rollback actually works by jumping back to the last chat choice
+    ## show chat screen
     window hide
     show screen chat_messages_view
 
@@ -164,6 +163,7 @@ label cont:
             mc "wait hold on everyone"
             mc "look at my new icon and name color that i stole from Felix!"(fastmode=1, ot=[f, s])
 
+    $ renpy.pause()
     # Swap to ADV textbox mode - hide chat screen and turn off auto mode
     $ preferences.afm_enable = False
     hide screen chat_messages_view
